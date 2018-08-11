@@ -79,9 +79,6 @@ class NeuralNet():
 		return J_temp + lambda_sum
 
 
-	def cost_lambda(self, lambda_value):
-		pass
-
 
 	def sigmoid_gradient(self, z):
 		return np.multiply(self.sigmoid(-z), (1 - self.sigmoid(-z)))
