@@ -23,7 +23,7 @@ class NeuralNet():
 	def initialize_theta(self, epsilon):
 		input_length = np.size(self.input_layer, 0)
 		layer_dims = [input_length] + self.hidden_layers + [self.output_layer]
-		return [np.random.rand(layer_dims[i+1], layer_dims[i]) * ((2 * epsilon) - epsilon) for i in range(len(layer_dims[0:-1]))]
+		return [np.random.rand(layer_dims[i+1], layer_dims[i]+1) * ((2 * epsilon) - epsilon) for i in range(len(layer_dims[0:-1]))]
 
 	'''Returns np.ndarray of outputs using sigmoid function'''
 	def sigmoid(self, z):
@@ -35,12 +35,30 @@ class NeuralNet():
 		a = []
 		for i in range(0, n):
 			if i == 0:
-				temp_z = np.dot(theta[i], self.input_layer)
+				# add 1 to column of each input except output layer
+				X = self.input_layer
+				if X.ndim == 1:
+					X = np.insert(X, 0, 1, axis=0)
+				else:
+					X = np.insert(X, 0, 1, axis=1)
+				temp_z = np.dot(theta[i], X)
+				temp_a = self.sigmoid(-temp_z)
+				if temp_a.ndim == 1:
+					temp_a = np.insert(temp_a, 0, 1, axis=0)
+				else:
+					temp_a = np.insert(temp_a, 0, 1, axis=1)
+				a.append(temp_a)
+			elif i == (n-1):
+				temp_z = np.dot(theta[i], a[-1])
 				temp_a = self.sigmoid(-temp_z)
 				a.append(temp_a)
 			else:
 				temp_z = np.dot(theta[i], a[-1])
 				temp_a = self.sigmoid(-temp_z)
+				if temp_a.ndim == 1:
+					temp_a = np.insert(temp_a, 0, 1, axis=0)
+				else:
+					temp_a = np.insert(temp_a, 0, 1, axis=1)
 				a.append(temp_a)
-			return a
+		return a
 
