@@ -8,6 +8,7 @@ class NeuralNet():
 	output layer is the dimension of the output layer (based on the model)
 	'''
 
+
 	def __init__(self, input_layer, hidden_layers, output_layer, y, epsilon):
 		if isinstance(input_layer, np.ndarray):
 			self.input_layer = input_layer
@@ -37,13 +38,13 @@ class NeuralNet():
 		assert isinstance(z, np.ndarray), 'input must be an np.ndarray'
 		return 1 / (1 + np.exp(-z))
 
+
 	'''Returns results of each layer of neural net until computing final output function'''
-	def compute_output(self):
+	def compute_output(self, input_layer):
 		a = []
 		for i in range(0, self.theta_n):
 			if i == 0:
-				# add 1 to column of each input except output layer
-				X = self.input_layer
+				X = input_layer
 				if X.ndim == 1:
 					X = np.insert(X, 0, 1, axis=0)
 				else:
@@ -70,15 +71,51 @@ class NeuralNet():
 		return a
 
 
-	def compute_cost(self, h, theta, lambda_value=0):
+	def compute_cost(self, h, lambda_value=0):
 		J_temp = (1 / self.m) * np.sum(np.multiply(-self.y, np.log(h)) - np.multiply((1 - y), np.log(1-h)))
 		if lambda_value == 0:
 			lambda_sum = 0
 		else:
-			lambda_sum = (lambda_value / (2 * self.m)) * sum([np.sum(np.power(theta[i], 2)) for i in range(len(theta)-1)])
+			lambda_sum = (lambda_value / (2 * self.m)) * sum([np.sum(np.power(self.theta[i], 2)) for i in range(self.theta_n - 1)])
 		return J_temp + lambda_sum
 
 
 
 	def sigmoid_gradient(self, z):
 		return np.multiply(self.sigmoid(-z), (1 - self.sigmoid(-z)))
+
+
+	def backprop(self, learning_rate):
+		theta_grad []
+		for z in range(self.theta_n):
+			theta_grad.append(np.zeros(theta[z].shape))
+
+		for i in range(self.m - 1):
+			if self.input_layer.ndim == 1:
+				a = compute_cost(self.input_layer[i])
+			else:
+				a = compute_cost(self.input_layer[i, :])
+			if self.y.ndim == 1:
+				yy = self.y[t]
+			else:
+				yy = self.y[t, :]
+
+			'''compute the error for each layer'''
+			dels = []
+			for l in reversed(range(self.theta_n)):
+				if l == (self.theta_n - 1):
+					error_l = a[-1] - yy
+					dels.append(error_l)
+				else:
+					del_temp = np.multiply(np.dot(theta[l], dels[-1]), sigmoid_gradient(np.dot(theta[l-1], a[l-2]))
+					dels.append(del_temp)
+
+				'''compute weight update'''
+				theta_grad[l] = theta_grad[l] + np.dot(del_temp, np.transpose(a[l-2]))
+				theta[l] = theta[l] - (learning_rate * theta_grad[l])
+			
+			
+
+
+
+
